@@ -1,4 +1,4 @@
-package nextstep.sessions.domain;
+package nextstep.images.domain;
 
 public class SessionImageSize {
     public static final int MIN_WIDTH = 300;

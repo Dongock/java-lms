@@ -1,4 +1,4 @@
-package nextstep.sessions.domain;
+package nextstep.images.domain;
 
 public class SessionImage {
     private final SessionImageByte imageByte;

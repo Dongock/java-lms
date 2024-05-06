@@ -1,4 +1,4 @@
-package nextstep.sessions.domain;
+package nextstep.images.domain;
 
 public class SessionImageByte {
     public static final int MAX_BYTE = 1000;

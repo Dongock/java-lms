@@ -1,5 +1,6 @@
 package nextstep.sessions.domain;
 
+import nextstep.images.domain.SessionImage;
 import nextstep.payments.domain.Payment;
 import nextstep.users.domain.NsUser;
 
