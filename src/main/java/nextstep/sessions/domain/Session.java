@@ -17,23 +17,16 @@ public class Session {
     private final LocalDateTime createdAt;
     private SessionStatus sessionStatus;
     private final SessionType sessionType;
-    private final NsUsers nsUsers;
+    private final NsUsers nsUsers = new NsUsers();
     private UserCount maxUserCount;
     private Price price;
 
 
-    private Session(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus) {
-        this.id = id;
-        this.courseId = courseId;
-        this.sessionPeriod = sessionPeriod;
-        this.sessionImage = sessionImage;
-        this.nsUsers = new NsUsers();
-        this.sessionStatus = sessionStatus;
-        this.sessionType = SessionType.FREE;
-        this.createdAt = LocalDateTime.now();
+    private Session(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus, SessionType sessionType) {
+        this(id, courseId, sessionPeriod, sessionImage, sessionStatus, sessionType, 0, 0);
     }
 
-    private Session(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus, int maxUserCount, int price) {
+    private Session(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus, SessionType sessionType, int maxUserCount, int price) {
         this.id = id;
         this.courseId = courseId;
         this.sessionPeriod = sessionPeriod;
@@ -41,19 +34,18 @@ public class Session {
         this.createdAt = LocalDateTime.now();
         this.sessionStatus = sessionStatus;
         this.sessionType = SessionType.PAY;
-        this.nsUsers = new NsUsers();
         this.maxUserCount = new UserCount(maxUserCount);
         this.price = new Price(price);
     }
 
     public static Session createFreeSession(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus) {
-        return new Session(id, courseId, sessionPeriod, sessionImage, sessionStatus);
+        return new Session(id, courseId, sessionPeriod, sessionImage, sessionStatus, SessionType.FREE);
     }
 
     public static Session createPaySession(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus, int maxUserCount, int price) {
         validatePositive(maxUserCount);
         validatePositive(price);
-        return new Session(id, courseId, sessionPeriod, sessionImage, sessionStatus, maxUserCount, price);
+        return new Session(id, courseId, sessionPeriod, sessionImage, sessionStatus, SessionType.PAY, maxUserCount, price);
     }
 
     public void changeSessionStatusIsClose() {
