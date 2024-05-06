@@ -2,7 +2,6 @@ package nextstep.sessions.domain;
 
 import nextstep.payments.domain.Payment;
 import nextstep.users.domain.NsUser;
-import nextstep.users.domain.NsUsers;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -16,14 +15,12 @@ public class Session {
     private final SessionImage sessionImage;
     private final LocalDateTime createdAt;
     private SessionStatus sessionStatus;
-    private final SessionType sessionType;
-    private final NsUsers nsUsers = new NsUsers();
-    private UserCount maxUserCount;
-    private Price price;
+    private final Enrollment enrollment;
+
 
 
     private Session(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus, SessionType sessionType) {
-        this(id, courseId, sessionPeriod, sessionImage, sessionStatus, sessionType, 0, 0);
+        this(id, courseId, sessionPeriod, sessionImage, sessionStatus, sessionType, ZERO, ZERO);
     }
 
     private Session(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus, SessionType sessionType, int maxUserCount, int price) {
@@ -33,9 +30,7 @@ public class Session {
         this.sessionImage = sessionImage;
         this.createdAt = LocalDateTime.now();
         this.sessionStatus = sessionStatus;
-        this.sessionType = SessionType.PAY;
-        this.maxUserCount = new UserCount(maxUserCount);
-        this.price = new Price(price);
+        this.enrollment = new Enrollment(sessionType, new UserCount(maxUserCount), new Price(price));
     }
 
     public static Session createFreeSession(Long id, Long courseId, SessionPeriod sessionPeriod, SessionImage sessionImage, SessionStatus sessionStatus) {
@@ -62,11 +57,7 @@ public class Session {
 
     public void signUp(NsUser nsUser, Payment payment) {
         checkSessionStatus();
-        if (sessionType.equals(SessionType.PAY)) {
-            checkSessionUserCount();
-            payment.checkPayment(this.id, nsUser.getId(), this.price);
-        }
-        this.nsUsers.add(nsUser);
+        enrollment.signUp(id, nsUser, payment);
     }
 
     private void checkSessionStatus() {
@@ -78,13 +69,6 @@ public class Session {
     private static void validatePositive(int number) {
         if (number < ZERO) {
             throw new IllegalArgumentException("0보다 작은 수가 올 수 없습니다.");
-        }
-    }
-
-    private void checkSessionUserCount() {
-        if (!maxUserCount.biggerThan(this.nsUsers.size())) {
-            changeSessionStatusIsClose();
-            throw new IllegalArgumentException("유료 강의의 최대 수강인원을 초과할 수 없습니다.");
         }
     }
 
